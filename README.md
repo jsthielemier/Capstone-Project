@@ -1,4 +1,4 @@
-# Jacob Thielemier's M.S. in Data Science Capstone Project at the Georgia Higher Education Healthcare Initiative
+# Capstone Project at the Georgia Higher Education Healthcare Initiative
 
 ### Summary
 
