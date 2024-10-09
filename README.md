@@ -2,7 +2,7 @@
 
 ### Summary
 
-The Georgia Higher Education Healthcare Initiative aims to generate ideas and action plans to significantly improve Georgia’s standing and the number of RNs and MDs who practice in the state. We will accomplish this by offering a path for collaboration to improve the state’s healthcare workforce. We will outline a set of feasible, meaningful collaborative action steps across healthcare, academia, and communities to strengthen our state’s capacity to help Georgians get and stay healthy. We are sponsored by our benefactor James (Jim) M. Hull of Augusta, Georgia. Jim serves on the Board of Regents for the University System of Georgia.
+The Georgia Higher Education Healthcare Initiative aims to generate ideas and action plans to significantly improve Georgia’s standing and the number of RNs and MDs who practice in the state. We will accomplish this by offering a path for collaboration to improve the state’s healthcare workforce. We will outline a set of feasible, meaningful collaborative action steps across healthcare, academia, and communities to strengthen our state’s capacity to help Georgians get and stay healthy. 
 
 ### Data and Tools
 
