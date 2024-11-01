@@ -106,4 +106,6 @@ hist(Average_Resident_Cost_Line_18$ITM_VAL_NUM,
      ylab = "Frequency", 
      border = "black")
 
-
+Hospital_Type <- subset(HOSP10_2022_NMRC, 
+                        WKSHT_CD == "S200001")
+print(Hospital_Type)
