@@ -81,7 +81,7 @@ preprocess <- preProcess(predictors, method = "medianImpute")
 predictors_imputed <- predict(preprocess, predictors)
 
 # Split the data into training and testing sets
-set.seed(42)
+set.seed(123)
 trainIndex <- createDataPartition(target, p = 0.7, list = FALSE)
 train_data <- predictors_imputed[trainIndex, ]
 test_data <- predictors_imputed[-trainIndex, ]
@@ -100,4 +100,35 @@ r2 <- cor(test_target, predictions)^2
 summary(model$finalModel)
 cat("MSE:", mse, "\n")
 cat("R-squared:", r2, "\n")
+
+
+
+
+
+
+
+
+
+dat$`UME Rank` <- as.numeric(as.character(dat$`UME Rank`))
+dat$`GME Rank` <- as.numeric(as.character(dat$`GME Rank`))
+dat$`Physicians Rank` <- as.numeric(as.character(dat$`Physicians Rank`))
+dat <- dat[complete.cases(dat$`UME Rank`, dat$`GME Rank`, dat$`Physicians Rank`), ]
+
+
+cor(dat$`UME Rank`, dat$`Physicians Rank`, method = "spearman")
+plot(dat$`UME Rank`, dat$`Physicians Rank`,
+     main = "Scatterplot of UME Rank vs Physicians Rank",
+     xlab = "UME Rank",
+     ylab = "Physicians Rank",
+     pch = 19, col = "blue")
+cor.test(dat$`UME Rank`, dat$`Physicians Rank`, method = "spearman")
+
+
+cor(dat$`GME Rank`, dat$`Physicians Rank`, method = "spearman")
+plot(dat$`GME Rank`, dat$`Physicians Rank`,
+     main = "Scatterplot of GME Rank vs Physicians Rank",
+     xlab = "GME Rank",
+     ylab = "Physicians Rank",
+     pch = 19, col = "blue")
+cor.test(dat$`GME Rank`, dat$`Physicians Rank`, method = "spearman")
 
