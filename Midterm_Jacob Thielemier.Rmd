@@ -1,0 +1,238 @@
+---
+title: "Midterm"
+author: "Jacob Thielemier"
+date: "2025-03-16"
+output: pdf_document
+---
+
+```{r setup, echo = FALSE}
+knitr::opts_chunk$set(
+  cache = TRUE,
+  echo = FALSE,
+  error = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  comment = NA,
+  results = "markup"
+)
+```
+
+## Question 1
+
+-   The plot below shows pretty consistent behavior between different time points. Most of the subject follow a similar rise and then fall pattern.
+
+-   Most subjects peak at a time period of 25. Several subjects follow each other by rising and falling at the same time periods. But a few outliers exists that show sudden deviations near 10 and 30.
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readr)
+
+# Read the EEG data
+eeg_data <- read_csv("EEG.csv")
+
+# Rename the first column to 'Time' (as it represents the time points)
+colnames(eeg_data)[1] <- "Time"
+
+# Reshape the data: each remaining column is a subject.
+eeg_long <- eeg_data %>%
+  pivot_longer(
+    cols = -Time,         # All columns except Time are subject columns
+    names_to = "Subject", # Create a new column named "Subject"
+    values_to = "EEG_Value"  # Values will be stored in "EEG_Value"
+  ) %>%
+  mutate(Time = as.numeric(Time))  # Ensure Time is numeric
+
+# Plot EEG time series for each subject
+ggplot(eeg_long, aes(x = Time, y = EEG_Value, color = Subject)) +
+  geom_line() +
+  labs(
+    title = "EEG Time Series by Subject",
+    x = "Time Point",
+    y = "EEG Value",
+    color = "Subject"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")  # Hide legend if too cluttered
+
+```
+
+## Question 2
+
+-   The heatmap below shows that there is clustering among the subjects.
+
+    -   One cluster in the top-left where the subjects are relatively genetically similar. The lighter yellow shades mean smaller distances.
+
+    -   Another cluster in the bottom-right is darker red. Meaning those are more similar withing their own group, but also more distant from the other cluster.
+
+-   The overall distance between the two cluster is far that suggests there is a high genetic dissimilarity between the subjects in the two clusters.
+
+```{r}
+library(reshape2)
+library(pheatmap)
+
+snp_data <- read_csv("SNP.csv")
+
+snp_matrix <- snp_data %>%
+  select(-1) %>%        # remove the first column (Subject ID)
+  as.matrix()
+
+# Compute Euclidean distance matrix
+dist_matrix <- dist(snp_matrix, method = "euclidean")
+
+# Convert distance object to a matrix
+dist_matrix_mat <- as.matrix(dist_matrix)
+
+# Plot the heatmap
+pheatmap(
+  dist_matrix_mat,
+  main = "Genetic Similarity (Euclidean Distance) Heatmap",
+  clustering_distance_rows = "euclidean",
+  clustering_distance_cols = "euclidean"
+)
+```
+
+## Question 3
+
+```{r}
+library(FactoMineR)
+library(knitr)
+
+# Prepare the EEG data:
+# Assume 'eeg_data' is in wide format with the first column as 'Time'
+# and the remaining columns as subjects.
+# Convert to a matrix and transpose so that rows represent subjects.
+eeg_matrix <- as.matrix(eeg_data[,-1])
+eeg_subjects <- t(eeg_matrix)
+
+# Prepare the SNP data:
+# Assume 'snp_matrix' is already a matrix with subjects as rows and SNPs as columns.
+snp_subjects <- snp_matrix
+
+# Compute the RV coefficient using FactoMineR's coeffRV function.
+rv_result <- coeffRV(eeg_subjects, snp_subjects)
+
+# Manually create a table with the desired values.
+rv_table <- data.frame(
+  Metric = c("RV", "RV Std", "Mean", "Variance", "Skewness", "p-value"),
+  Value = c(
+    round(rv_result$rv, 3),
+    round(rv_result$rvstd, 3),
+    round(rv_result$mean, 3),
+    round(rv_result$variance, 5),
+    round(rv_result$skewness, 3),
+    format(rv_result$p.value, scientific = TRUE, digits = 3)
+  ),
+  stringsAsFactors = FALSE
+)
+
+# Print the table neatly using kable
+kable(rv_table, 
+      caption = "Summary of RV Coefficient Results from FactoMineR",
+      align = "c")
+
+```
+
+## Question 4
+
+```{r}
+# Calculate the mean EEG value for each subject (ignoring the Time column)
+eeg_means <- colMeans(eeg_data[,-1])
+
+# Plot a histogram of the EEG means
+hist(eeg_means, 
+     breaks = 20,
+     main = "Histogram of Subject EEG Means", 
+     xlab = "Mean EEG Value", 
+     col = "lightblue", 
+     border = "white")
+```
+
+## Question 5
+
+```{r}
+library(VCA)
+library(knitr)
+
+# Assuming your long-format EEG data is stored in 'eeg_long'
+long_eeg_data <- as.data.frame(eeg_long)
+
+# Fit the one-way random effects model using anovaVCA
+model_vca_full <- anovaVCA(EEG_Value ~ Subject, long_eeg_data)
+
+# Print the model summary (for reference)
+print(model_vca_full)
+
+```
+
+## Question 6
+
+-   Based on the Scree plot below we see the elbow takes shape at the second PCA. We should only use two components.
+
+```{r}
+# Assuming the SNP data is loaded into 'snp_data'
+# Remove the first column (subject identifier) and convert the rest to a matrix
+snp_matrix <- as.matrix(snp_data[,-1])
+
+# Perform PCA on the SNP matrix with scaling
+pca_result <- prcomp(snp_matrix, scale. = TRUE)
+
+# Extract the proportion of variance explained by each principal component
+pve <- summary(pca_result)$importance[2, ]
+
+# Produce the screeplot
+plot(pve, type = "b",
+     xlab = "Principal Component",
+     ylab = "Proportion of Variance Explained",
+     main = "Screeplot of SNP Data")
+```
+
+## Question 7
+
+-   There is strong evidence (p < 0.0001) that the EEG means are associated with PC1. However, PC2 is not significantly associated with EEG means (p = 0.729). This tell me that at least one genetic principal component (PC1) has a clear relationship with the EEG phenotype.
+
+-   The adjusted R-squared is 0.396, meaning that 39.6% of the total variance in EEG means is explained by these genetic principal components.
+
+```{r}
+# Calculate the EEG means for each subject
+eeg_means <- colMeans(eeg_data[,-1])
+
+# Prepare the data frame with EEG means and selected PCs
+pcs_selected <- pca_result$x[, 1:2]  # first two PCs selected based on screeplot
+regression_df <- data.frame(
+  EEG_Mean = eeg_means,
+  PC1 = pcs_selected[, 1],
+  PC2 = pcs_selected[, 2]
+)
+
+# Fit linear regression model
+lm_fit <- lm(EEG_Mean ~ PC1 + PC2, data = regression_df)
+
+# Extract important regression results
+regression_summary <- summary(lm_fit)
+
+# Create a clean data frame to display coefficients and p-values
+regression_table <- data.frame(
+  Predictor = rownames(regression_summary$coefficients),
+  Estimate = round(regression_summary$coefficients[, 1], 4),
+  `Std. Error` = round(regression_summary$coefficients[, 2], 4),
+  `t-value` = round(regression_summary$coefficients[, 3], 3),
+  `p-value` = round(regression_summary$coefficients[, 4], 4),
+  check.names = FALSE
+)
+
+# Display the table using kable
+library(knitr)
+kable(regression_table, 
+      caption = "Linear Regression of EEG Means on Genetic Principal Components")
+```
+
+## Question 8
+
+
+
+
+
+
+
