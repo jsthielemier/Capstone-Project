@@ -1,10 +1,14 @@
 library(ggplot2)
 library(dplyr)
+library(tidyverse)
 
 #rename all the columns in each df
 colnames(HOSP10_2022_NMRC) <- c("RPT_REC_NUM", "WKSHT_CD", "LINE_NUM", "CLMN_NUM", "ITM_VAL_NUM")
 colnames(HOSP10_2022_ALPHA) <- c("RPT_REC_NUM", "WKSHT_CD", "LINE_NUM", "CLMN_NUM", "ITM_ALPHNMRC_ITM_TXT")
 colnames(HOSP10_2022_RPT) <- c("RPT_REC_NUM", "PRVDR_CTRL_TYPE_CD", "PROVIDER_NUMBER", "NPI", "RPT_STUS_CD", "FY_BGN_DT", "FY_END_DT", "PROC_DT", "INITL_RPT_SW", "LAST_RPT_SW", "TRNSMTL_NUM", "FI_NUM", "ADR_VNDR_CD", "FI_CREAT_DT", "UTIL_CD", "NPR_DT", "SPEC_IND", "FI_RCPT_DT")
+
+
+
 
 
 # 1. Pull all providers (no state filter)
@@ -50,3 +54,44 @@ pull_value <- function(wksht_cd, line_num, new_col_name) {
     select(RPT_REC_NUM, ITM_VAL_NUM) %>%
     rename(!!new_col_name := ITM_VAL_NUM)
 }
+
+
+
+
+
+#add in AGCME filled residencies
+US_Hospitals_filtered <- US_Hospitals_filtered %>%
+  mutate(City = toupper(City),
+         State = toupper(State))
+
+ACGME_Programs <- ACGME_Programs %>%
+  mutate(ProgramCity = toupper(ProgramCity),
+         ProgramStateName = toupper(ProgramStateName))
+
+hospital_programs_join <- US_Hospitals_filtered %>%
+  left_join(ACGME_Programs,
+            by = c("City" = "ProgramCity", "State" = "ProgramStateName"))
+
+hospital_specialties_wide <- hospital_programs_join %>%
+  select(PROVIDER_NUMBER, HOSP10_Name, City, State, SpecialtyName, PositionsFilledTotal) %>%
+  # Filter out missing specialties
+  filter(!is.na(SpecialtyName)) %>%
+  group_by(PROVIDER_NUMBER, HOSP10_Name, City, State, SpecialtyName) %>%
+  summarise(Total_Filled = sum(PositionsFilledTotal, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(names_from = SpecialtyName,
+              values_from = Total_Filled,
+              values_fill = 0)
+
+US_Hospitals_with_specialties <- US_Hospitals_filtered %>%
+  left_join(hospital_specialties_wide, by = c("PROVIDER_NUMBER", "HOSP10_Name", "City", "State"))
+
+
+
+
+
+
+
+
+write.csv(US_Hospitals_filtered, 
+          "C:/Users/Jacob Thielemier/OneDrive - Hull Property Group/Desktop/Capstone-Project/US_Hospitals_filtered.csv", 
+          row.names = FALSE)
