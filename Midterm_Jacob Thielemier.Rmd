@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 ## Question 1
 
--   The plot below shows pretty consistent behavior between different time points. Most of the subject follow a similar rise and then fall pattern.
+-   The plot below shows pretty consistent behavior between different time points. Most of the subjects follow a similar rise and then fall pattern.
 
 -   Most subjects peak at a time period of 25. Several subjects follow each other by rising and falling at the same time periods. But a few outliers exists that show sudden deviations near 10 and 30.
 
@@ -66,7 +66,7 @@ ggplot(eeg_long, aes(x = Time, y = EEG_Value, color = Subject)) +
 
     -   Another cluster in the bottom-right is darker red. Meaning those are more similar withing their own group, but also more distant from the other cluster.
 
--   The overall distance between the two cluster is far that suggests there is a high genetic dissimilarity between the subjects in the two clusters.
+-   The overall distance between the two clusters is far and that suggests there is a high genetic dissimilarity between the subjects in the two clusters.
 
 ```{r}
 library(reshape2)
@@ -94,6 +94,10 @@ pheatmap(
 ```
 
 ## Question 3
+
+-   We can see in the table below that the Mantel test shows significant genetic-EEG association (RV = 0.459, p < 0.0001).
+
+-   Genetic differences among the subjects significantly influence EEG responses.
 
 ```{r}
 library(FactoMineR)
@@ -129,12 +133,14 @@ rv_table <- data.frame(
 
 # Print the table neatly using kable
 kable(rv_table, 
-      caption = "Summary of RV Coefficient Results from FactoMineR",
+      caption = "Summary of RV Coefficient Results Between EEG and SNP Data",
       align = "c")
 
 ```
 
 ## Question 4
+
+-   In the histogram below, EEG data for each subject is summarized by the mean EEG value across all time points. This provides a single EEG measure per subject.
 
 ```{r}
 # Calculate the mean EEG value for each subject (ignoring the Time column)
@@ -152,18 +158,70 @@ hist(eeg_means,
 ## Question 5
 
 ```{r}
-library(VCA)
-library(knitr)
+# Load necessary libraries
+library(lme4)
+library(lme4qtl)
+library(readr)
+library(dplyr)
 
-# Assuming your long-format EEG data is stored in 'eeg_long'
-long_eeg_data <- as.data.frame(eeg_long)
+# ----- Read and Prepare SNP Data -----
+snp_data <- read_csv("SNP.csv")
+colnames(snp_data)[1] <- "Subject"
+snp_data$Subject <- as.character(snp_data$Subject)
 
-# Fit the one-way random effects model using anovaVCA
-model_vca_full <- anovaVCA(EEG_Value ~ Subject, long_eeg_data)
+# ----- Read and Prepare EEG Data -----
+eeg_data <- read_csv("EEG.csv")
+colnames(eeg_data)[1] <- "Time"
 
-# Print the model summary (for reference)
-print(model_vca_full)
+# Compute EEG means for each subject
+eeg_means <- colMeans(eeg_data[,-1])
+subject_ids <- sub("^V", "", colnames(eeg_data)[-1])
 
+# Create EEG dataframe
+eeg_df <- data.frame(Subject = subject_ids, EEG_Mean = eeg_means)
+
+# ----- Merge EEG and SNP Data -----
+merged_data <- merge(eeg_df, snp_data, by = "Subject")
+if(nrow(merged_data) == 0) stop("Merge error: Check matching subject IDs.")
+
+# ----- Compute Genomic Relationship Matrix (GRM) -----
+snp_matrix <- scale(as.matrix(merged_data[,-c(1,2)]))
+GRM <- tcrossprod(snp_matrix) / ncol(snp_matrix)
+rownames(GRM) <- merged_data$Subject
+colnames(GRM) <- merged_data$Subject
+
+# ----- Fit Variance Components Model using lme4qtl -----
+merged_data$Subject <- as.factor(merged_data$Subject)
+model_lme4 <- relmatLmer(EEG_Mean ~ (1|Subject), data = merged_data, relmat = list(Subject = GRM))
+
+# Summarize the model
+summary(model_lme4)
+
+# Extract variance components
+vc <- as.data.frame(VarCorr(model_lme4))
+var_genetic <- vc$vcov[1]
+var_residual <- vc$vcov[2]
+
+# Compute proportion of variance explained
+prop_explained <- var_genetic / (var_genetic + var_residual)
+cat("Proportion of variance explained by SNPs:", round(prop_explained, 3), "\n")
+
+# Approximate standard error for genetic variance
+se_genetic <- sqrt(2 / (length(merged_data$Subject))) * var_genetic
+
+# Wald approximation for 95% confidence interval of genetic variance
+ci_lower_genetic <- var_genetic - 1.96 * se_genetic
+ci_upper_genetic <- var_genetic + 1.96 * se_genetic
+
+# Ensure the confidence interval lower bound is not negative
+ci_lower_genetic <- max(ci_lower_genetic, 0)
+
+# Confidence interval for proportion of variance explained
+prop_CI_lower <- ci_lower_genetic / (ci_lower_genetic + var_residual)
+prop_CI_upper <- ci_upper_genetic / (ci_upper_genetic + var_residual)
+
+cat("Approximate 95% CI for proportion explained:", 
+    round(prop_CI_lower, 3), "-", round(prop_CI_upper, 3), "\n")
 ```
 
 ## Question 6
@@ -230,7 +288,18 @@ kable(regression_table,
 
 ## Question 8
 
+-   PCA-based regression shows that genetic variation significantly influences EEG means:
 
+    -   PC1 had a strong association (p < 0.0001); PC2 did not (p = 0.729).
+    -   Genetic principal components explained 39.6% (adjusted R²) of EEG variability.
+    -   Scree plot suggested retaining two principal components, with a clear elbow at PC2.
+
+-   The variance components analysis provided an overall measure of genetic influence:
+
+    -   Genetic relatedness explained a substantial proportion of EEG variance (96.8%, 95% CI: 94.8–97.7%, from Question 5).
+    -   Mantel/RV coefficient analysis also indicated significant genotype-EEG association (RV = 0.459, p < 0.0001, from Question 3).
+
+-   Together, these methods confirm a clear genetic contribution to EEG phenotypes, capturing both specific genetic components and overall genetic relatedness.
 
 
 
