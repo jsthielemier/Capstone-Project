@@ -1,0 +1,138 @@
+---
+title: "Capstone Paper"
+author: "Jacob Thielemier"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Georgia is facing a critical shortage of physicians, with significant implications for healthcare access and quality across the state. As of 2024, Georgia has 241 physicians per 100,000 residents, well below the national average of 311 physicians per 100,000 (Umbach, 2008). This shortage creates widespread gaps in access to care, particularly in primary care and high-need specialties. While the physician workforce is strained statewide, disparities are especially acute in rural areas, where hospitals consistently struggle to attract and retain healthcare providers (Georgia Health Policy Center [GHPC], 2024). These challenges contribute to delayed preventive care, higher reliance on emergency departments, increased travel times for medical services, and poorer health outcomes in underserved communities (GHPC, 2024).
+
+#### Who Are We?
+
+This study focuses on understanding and addressing Georgia’s physician workforce shortage, particularly through the lens of graduate medical education (GME) expansion. Despite efforts over the past two decades to increase the number of medical school graduates and residency positions, Georgia remains well below the national average in physician supply. The state’s failure to retain medical school graduates and recruit physicians to practice in rural areas has led to persistent workforce disparities. Data from GHPC’s 2024 landscape scan confirms that rural communities in Georgia face an ongoing decline in physician availability, with over 80% of rural counties experiencing workforce shrinkage (GHPC, 2024).
+
+#### Trends Over Time
+
+Multi-year data comparisons reveal a troubling trend: Georgia’s physician supply has failed to keep pace with its population growth. Between 2010 and 2020, Georgia’s population grew by nearly 10%, but its physician workforce lagged behind, growing by less than 5% in the same period (Umbach, 2008; GHPC, 2024). The situation is more severe in rural counties, where physician numbers have actually declined over the past decade despite an overall increase in medical school enrollment (GHPC, 2024).
+
+#### National vs. Georgia: Benchmarking Successful Strategies
+
+States like Oregon and North Carolina have implemented targeted strategies to recruit and retain physicians in rural and underserved areas, including robust loan repayment programs, rural residency tracks, and pipeline programs that identify and support students from rural backgrounds (GHPC, 2024). For example, North Carolina’s Area Health Education Centers (AHEC) program has successfully increased the number of physicians practicing in rural areas by providing pre-medical mentorship and residency opportunities in underserved communities. In contrast, Georgia’s fragmented efforts have lacked consistency, scale, and long-term planning (GHPC, 2024).
+
+#### Previous Interventions: What’s Been Tried and Why It Fell Short
+
+Georgia has attempted to address its physician shortage through a variety of interventions, including loan repayment programs, tax incentives, and investments in expanding medical school class sizes. However, many of these initiatives have fallen short due to inconsistent funding, lack of coordination, and inadequate tracking of return on investment (GHPC, 2024). Tripp Umbach’s 2008 report emphasized the need for simultaneous investment in both undergraduate medical education (UME) and GME, warning that expanding medical school enrollment without increasing residency slots would not resolve Georgia’s physician shortage (Umbach, 2008). Unfortunately, this prediction has largely come true.
+
+#### Medical Education Pipeline: Expansion Without Retention
+
+Despite significant investments in medical school expansion, Georgia has struggled to translate these gains into increased physician retention. The state’s limited number of residency slots has forced many graduates to leave Georgia for postgraduate training, and studies show that physicians are more likely to practice where they complete their residencies (GHPC, 2024; Umbach, 2008). As a result, Georgia continues to lose medical talent to other states, undermining efforts to build a sustainable physician workforce.
+
+#### Objective of This Study
+
+The objective of this capstone project is twofold:
+
+1.  **Visualize Trends and Changes Over Time**\
+    Develop an interactive dashboard to visualize historical and current trends in Georgia’s physician workforce, with particular focus on spending of state Medicaid and federal Medicare funds. The dashboard will benchmark Georgia’s performance against peer states that have successfully expanded their physician workforces.
+
+2.  **Estimate Factors Influencing Residency Numbers**\
+    Build a predictive model to identify and quantify the factors that influence the number of GME residency slots available in Georgia. The model will evaluate potential policy interventions—such as increased funding for residency positions—and estimate their impact on physician retention and workforce distribution.
+
+By employing data science techniques such as regression modeling, this study aims to inform policymakers, healthcare leaders, and educators about effective strategies for addressing Georgia’s physician shortage. The findings will help guide resource allocation and policy development to strengthen the state’s medical education pipeline and improve healthcare access for all Georgians.
+
+## Methodology
+
+#### Research Design and Modeling Approach
+
+This study utilizes a quantitative modeling framework to examine how hospital characteristics predict the residency fill rate across Georgia hospitals. The analysis focuses on the percentage of unfilled Graduate Medical Education (GME) residency slots as the primary outcome variable, using publicly available hospital financial and operational data. In addition, the model simulates potential GME slot expansion under increased funding scenarios to estimate the capacity of Georgia hospitals to expand their physician workforce.
+
+#### Research Question
+
+This research is guided by the following question:
+
+***To what extent do hospital characteristics predict the residency program fill rate in Georgia hospitals?***
+
+#### Model Overview: Lasso Regression
+
+Given the range of potential predictor variables and the risk of multicollinearity within hospital and community-level characteristics, this study employs a Lasso (Least Absolute Shrinkage and Selection Operator) regression model.
+
+Lasso regression is a regularized linear modeling technique that applies a penalty to non-informative variables, shrinking their coefficients to zero. This method is particularly valuable in healthcare data environments where many hospital characteristics may overlap or interact, and where automatic variable selection improves model interpretability.
+
+#### Dependent Variable
+
+The dependent variable is the percentage of unfilled residency slots per hospital, calculated as:
+
+$$
+\text{Unfilled %} = 1 - \left( \frac{\text{Filled Slots}}{\text{Federal GME Cap}} \right)
+$$
+
+Hospitals with a low or zero Medicare GME cap are expected to have higher unfilled rates, given capacity constraints or lack of historical residency infrastructure.
+
+#### Independent Variables
+
+The Lasso regression model incorporates hospital-level predictors from the CMS HCRIS Cost Reports and community-level socioeconomic indicators from the American Community Survey. These variables are summarized below:
+
+| Category               | Variables Included                                                                      |
+|-----------------------|-------------------------------------------------|
+| Hospital Size          | Number of Beds, Federal GME Cap                                                         |
+| Location Factors       | Urban vs. Rural Status, HRSA Shortage Designation                                       |
+| Financial Capacity     | Median Income, Poverty Rate, Uninsured Rate                                             |
+| Hospital Type          | Ownership Type, System Affiliation                                                      |
+| Teaching Status        | Academic Medical Center Indicator                                                       |
+| Community Demographics | Population, % Population Over 65, Unemployment Rate, % with Bachelor’s Degree or Higher |
+
+All continuous variables were standardized, and categorical variables were one-hot encoded prior to model fitting. Missing values were imputed using median values for continuous variables and most-frequent values for categorical variables.
+
+#### Data and Tools
+
+The dataset was compiled from hospital cost report data (CMS HCRIS), residency program data (ACGME), and socioeconomic data from the U.S. Census Bureau. The model was developed using Python’s scikit-learn package, with Lasso regression applied through cross-validation to identify the optimal penalty term.
+
+#### Visualization Strategy
+
+In addition to statistical modeling, an interactive dashboard was developed in Power BI to visualize:
+
+-   The distribution of residency slots across Georgia hospitals
+
+-   Hospital characteristics associated with unfilled residency rates
+
+-   Predictive scenarios estimating potential slot expansion under increased funding
+
+#### Expected Outcomes
+
+This methodology is expected to:
+
+-   Identify the key hospital characteristics most predictive of residency fill rates
+
+-   Quantify the unfilled residency rate across Georgia hospitals
+
+-   Highlight specific hospitals or regions best positioned for GME slot expansion
+
+#### Results
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(glmnet)
+library(caret)
+library(broom)
+library(knitr)
+library(kableExtra)
+library(ggrepel)
+library(scales)
+
+
+```
+
+
+
+
+
