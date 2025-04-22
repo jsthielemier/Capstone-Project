@@ -129,7 +129,11 @@ library(kableExtra)
 library(ggrepel)
 library(scales)
 
+df <- read_excel("C:/Users/Jacob Thielemier/OneDrive - Hull Property Group/Desktop/Capstone-Project/GA_Hospitals_Final.xlsx")
 
+df <- df %>%
+  mutate(Percent_Unfilled = 1 - (Filled_Slots / Federal_GME_Cap)) %>%
+  filter(!is.na(Percent_Unfilled) & Percent_Unfilled >= 0 & Percent_Unfilled <= 1)
 ```
 
 

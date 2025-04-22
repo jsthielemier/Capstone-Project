@@ -1,0 +1,176 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Capstone Paper},
+  pdfauthor={Jacob Thielemier},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Capstone Paper}
+\author{Jacob Thielemier}
+\date{2025-04-15}
+
+\begin{document}
+\maketitle
+
+\subsection{Introduction}\label{introduction}
+
+Georgia is facing a critical shortage of physicians, with significant
+implications for healthcare access and quality across the state. As of
+2024, Georgia has 241 physicians per 100,000 residents, well below the
+national average of 311 physicians per 100,000 (Umbach, 2008). This
+shortage creates widespread gaps in access to care, particularly in
+primary care and high-need specialties. While the physician workforce is
+strained statewide, disparities are especially acute in rural areas,
+where hospitals consistently struggle to attract and retain healthcare
+providers (Georgia Health Policy Center {[}GHPC{]}, 2024). These
+challenges contribute to delayed preventive care, higher reliance on
+emergency departments, increased travel times for medical services, and
+poorer health outcomes in underserved communities (GHPC, 2024).
+
+\subsubsection{Who Are We?}\label{who-are-we}
+
+This study focuses on understanding and addressing Georgia's physician
+workforce shortage, particularly through the lens of graduate medical
+education (GME) expansion. Despite efforts over the past two decades to
+increase the number of medical school graduates and residency positions,
+Georgia remains well below the national average in physician supply. The
+state's failure to retain medical school graduates and recruit
+physicians to practice in rural areas has led to persistent workforce
+disparities. Data from GHPC's 2024 landscape scan confirms that rural
+communities in Georgia face an ongoing decline in physician
+availability, with over 80\% of rural counties experiencing workforce
+shrinkage (GHPC, 2024).
+
+\subsubsection{Trends Over Time}\label{trends-over-time}
+
+Multi-year data comparisons reveal a troubling trend: Georgia's
+physician supply has failed to keep pace with its population growth.
+Between 2010 and 2020, Georgia's population grew by nearly 10\%, but its
+physician workforce lagged behind, growing by less than 5\% in the same
+period (Umbach, 2008; GHPC, 2024). The situation is more severe in rural
+counties, where physician numbers have actually declined over the past
+decade despite an overall increase in medical school enrollment (GHPC,
+2024).
+
+\subsubsection{National vs.~Georgia: Benchmarking Successful
+Strategies}\label{national-vs.-georgia-benchmarking-successful-strategies}
+
+States like Oregon and North Carolina have implemented targeted
+strategies to recruit and retain physicians in rural and underserved
+areas, including robust loan repayment programs, rural residency tracks,
+and pipeline programs that identify and support students from rural
+backgrounds (GHPC, 2024). For example, North Carolina's Area Health
+Education Centers (AHEC) program has successfully increased the number
+of physicians practicing in rural areas by providing pre-medical
+mentorship and residency opportunities in underserved communities. In
+contrast, Georgia's fragmented efforts have lacked consistency, scale,
+and long-term planning (GHPC, 2024).
+
+\subsubsection{Previous Interventions: What's Been Tried and Why It Fell
+Short}\label{previous-interventions-whats-been-tried-and-why-it-fell-short}
+
+Georgia has attempted to address its physician shortage through a
+variety of interventions, including loan repayment programs, tax
+incentives, and investments in expanding medical school class sizes.
+However, many of these initiatives have fallen short due to inconsistent
+funding, lack of coordination, and inadequate tracking of return on
+investment (GHPC, 2024). Tripp Umbach's 2008 report emphasized the need
+for simultaneous investment in both undergraduate medical education
+(UME) and GME, warning that expanding medical school enrollment without
+increasing residency slots would not resolve Georgia's physician
+shortage (Umbach, 2008). Unfortunately, this prediction has largely come
+true.
+
+\subsubsection{Medical Education Pipeline: Expansion Without
+Retention}\label{medical-education-pipeline-expansion-without-retention}
+
+Despite significant investments in medical school expansion, Georgia has
+struggled to translate these gains into increased physician retention.
+The state's limited number of residency slots has forced many graduates
+to leave Georgia for postgraduate training, and studies show that
+physicians are more likely to practice where they complete their
+residencies (GHPC, 2024; Umbach, 2008). As a result, Georgia continues
+to lose medical talent to other states, undermining efforts to build a
+sustainable physician workforce.
+
+\subsubsection{Objective of This Study}\label{objective-of-this-study}
+
+The objective of this capstone project is twofold:
+
+\begin{verbatim}
+1.  **Visualize Trends and Changes Over Time**
+Develop an interactive dashboard to visualize historical and current trends in Georgia’s physician workforce, with particular focus on rural versus urban disparities. The dashboard will benchmark Georgia’s performance against peer states that have successfully expanded their physician workforces.
+
+2.  **Estimate Factors Influencing Residency Numbers**
+Build predictive models to identify and quantify the factors that influence the number of GME residency slots available in Georgia. The models will evaluate potential policy interventions—such as increased funding for residency positions—and estimate their impact on physician retention and workforce distribution.
+\end{verbatim}
+
+By employing data science techniques such as time series analysis and
+regression modeling, this study aims to inform policymakers, healthcare
+leaders, and educators about effective strategies for addressing
+Georgia's physician shortage. The findings will help guide resource
+allocation and policy development to strengthen the state's medical
+education pipeline and improve healthcare access for all Georgians.
+
+\end{document}

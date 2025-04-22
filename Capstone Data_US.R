@@ -48,12 +48,68 @@ US_Hospitals_filtered <- US_Hospitals_updated %>%
   filter(!is.na(`Filled Slots`) & `Filled Slots` > 0)
 
 # 9. Function to pull additional columns (no filters on these)
-pull_value <- function(wksht_cd, line_num, new_col_name) {
+pull_value <- function(wksht_cd, line_num, clmn_num, new_col_name) {
   HOSP10_2022_NMRC %>%
-    filter(WKSHT_CD == wksht_cd, LINE_NUM == line_num) %>%
+    filter(WKSHT_CD == wksht_cd, LINE_NUM == line_num, CLMN_NUM == clmn_num) %>%
     select(RPT_REC_NUM, ITM_VAL_NUM) %>%
     rename(!!new_col_name := ITM_VAL_NUM)
 }
+
+# 10. Use the function
+# 1. Hospital Location (Urban/Rural)
+urban_rural_status_begin <- pull_value("S200001", "02600", "00100", "Urban/Rural Status Begin")
+urban_rural_status_end   <- pull_value("S200001", "02700", "00100", "Urban/Rural Status End")
+
+# 2. Hospital Size
+number_of_beds <- pull_value("S300001", "01400", "00100", "Number of Beds")
+direct_gme_cap <- pull_value("E40A180", "00100", "00100", "Direct GME Cap")
+
+# 3. Hospital Type
+system_affiliation <- pull_value("S200001", "14100", "00100", "System Affiliation")
+control_type       <- pull_value("S200001", "02100", "00100", "Type of Control")
+
+# 4. Capabilities
+teaching_status <- pull_value("S200001", "05600", "00100", "Teaching Hospital Status")
+
+# 5. Financials
+ime_gme_cap   <- pull_value("E40A180", "00200", "00100", "IME GME Cap")
+fte_residents <- pull_value("E40A180", "00600", "00100", "FTE Residents")
+
+# Payer Mix (Medicare and Medicaid Days)
+medicare_days <- pull_value("S300001", "01400", "00600", "Medicare Days")
+medicaid_days <- pull_value("S300001", "01400", "00700", "Medicaid Days")
+
+# 6. Faculty/Resources
+faculty_cost <- pull_value("A000000", "05700", "00100", "Faculty Cost")  # Confirm the correct line
+
+# 7. Specialty Mix
+primary_care_ftes <- pull_value("S200001", "06101", "00100", "Primary Care FTEs")
+specialty_ftes    <- pull_value("S200001", "06104", "00100", "Specialty FTEs")
+
+# Combine all into US_Hospitals_filtered
+US_Hospitals_final <- US_Hospitals_filtered %>%
+  left_join(urban_rural_status_begin, by = "RPT_REC_NUM") %>%
+  left_join(urban_rural_status_end, by = "RPT_REC_NUM") %>%
+  left_join(number_of_beds, by = "RPT_REC_NUM") %>%
+  left_join(direct_gme_cap, by = "RPT_REC_NUM") %>%
+  left_join(system_affiliation, by = "RPT_REC_NUM") %>%
+  left_join(control_type, by = "RPT_REC_NUM") %>%
+  left_join(teaching_status, by = "RPT_REC_NUM") %>%
+  left_join(ime_gme_cap, by = "RPT_REC_NUM") %>%
+  left_join(fte_residents, by = "RPT_REC_NUM") %>%
+  left_join(medicare_days, by = "RPT_REC_NUM") %>%
+  left_join(medicaid_days, by = "RPT_REC_NUM") %>%
+  left_join(faculty_cost, by = "RPT_REC_NUM") %>%
+  left_join(primary_care_ftes, by = "RPT_REC_NUM") %>%
+  left_join(specialty_ftes, by = "RPT_REC_NUM") %>%
+  
+  # Derived columns
+  mutate(
+    Per_Resident_Cost = ifelse(`FTE Residents` > 0, `IME GME Cap` / `FTE Residents`, NA),
+    Faculty_to_Resident_Ratio = ifelse(`FTE Residents` > 0, `Faculty Cost` / `FTE Residents`, NA)
+  )
+
+
 
 
 
